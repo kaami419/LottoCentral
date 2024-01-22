@@ -5,10 +5,13 @@ const { logger } = require("../utils/logger");
 
 // Create a nodemailer transporter with your email configuration
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  service: "Gmail",
+  port: 587,
+  secure: false, // true for 465, false for other ports
   auth: {
-    user: Our_Email,
-    pass: "Kaami@123",
+    user: "rohabkhan3585@gmail.com",
+    pass: "ccyu whaf ehdv chud",
   },
 });
 
@@ -16,6 +19,7 @@ const transporter = nodemailer.createTransport({
 
 // ContactUs API
 async function contactUs(req, res, next) {
+  logger().info("running contact us function");
   const { name, email, message } = req.body;
 
   try {

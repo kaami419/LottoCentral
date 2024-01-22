@@ -12,7 +12,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       name: {
         type: DataTypes.STRING(100),
-        allowNull: false,
+        allowNull: true,
         min: 1,
         max: 100,
       },
@@ -37,7 +37,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       isAuthUser: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
       },
       password: {
         type: DataTypes.STRING(100),

@@ -26,7 +26,7 @@ async function createLottery(req, res, next) {
 
   try {
     // Check if the requesting user is an admin
-    if (req.user.userName !== "Admin") {
+    if (req.user.userName.toLowerCase() !== "admin") {
       return res.status(403).json({
         status: 403,
         error: "Forbidden: Only admin can create lotteries.",
@@ -52,13 +52,11 @@ async function createLottery(req, res, next) {
       color,
     });
 
-    return res
-      .status(200)
-      .json({
-        status: 200,
-        message: "Lottery Created Successfully",
-        data: newLottery,
-      });
+    return res.status(200).json({
+      status: 200,
+      message: "Lottery Created Successfully",
+      data: newLottery,
+    });
   } catch (error) {
     logger().error("Error in creating a lottery", error);
     next(error);
@@ -97,7 +95,7 @@ async function updateLottery(req, res, next) {
 
   try {
     // Check if the requesting user is an admin
-    if (req.user.userName !== "Admin") {
+    if (req.user.userName.toLowerCase() !== "admin") {
       return res.status(403).json({
         status: 403,
         error: "Forbidden: Only admin can create lotteries.",
@@ -139,7 +137,7 @@ async function deleteLottery(req, res, next) {
 
   try {
     // Check if the requesting user is an admin
-    if (req.user.userName !== "Admin") {
+    if (req.user.userName.toLowerCase() !== "admin") {
       return res.status(403).json({
         status: 403,
         error: "Forbidden: Only admin can create lotteries.",

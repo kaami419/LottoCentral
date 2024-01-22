@@ -10,7 +10,7 @@ async function getAllUsers(req, res, next) {
   try {
     logger().info("Getting All Users");
     // Check if the requesting user is an admin
-    if (req.user.userName !== "Admin") {
+    if (req.user.userName.toLowerCase() !== "admin") {
       return res.status(403).json({
         status: 403,
         error: "Forbidden: Only admin users can access this route",
@@ -43,10 +43,10 @@ async function createUser(req, res, next) {
   try {
     logger().info("creating a user");
     // Validate the input
-    if ((!name || !email) && (!username || !password)) {
+    if (!name && !email && !username && !password) {
       return res.status(400).json({
         status: 400,
-        error: "Name and email OR username and password are required fields.",
+        error: "Email, name, username and password are required.",
       });
     }
     let hashedPassword;
@@ -62,20 +62,18 @@ async function createUser(req, res, next) {
 
     // Create the user based on input
     const newUser = await UserModel.create({
-      name,
+      name: name || null,
       email,
       userName: username || null,
       password: hashedPassword || null,
       isAuthUser: !!username && !!password,
     });
 
-    return res
-      .status(200)
-      .json({
-        status: 200,
-        message: "User Created Successfully",
-        data: newUser,
-      });
+    return res.status(200).json({
+      status: 200,
+      message: "User Created Successfully",
+      data: newUser,
+    });
   } catch (error) {
     logger().error("Error in creating a user", error);
     next(error);
@@ -98,7 +96,7 @@ async function loginUser(req, res, next) {
     }
 
     const token = jwt.sign({ id: user.id }, "shshs", {
-      expiresIn: "2h",
+      expiresIn: "8h",
     });
 
     logger().info("user logging in successfully ");
