@@ -20,6 +20,14 @@ module.exports = (sequelize, Sequelize) => {
         type: DataTypes.FLOAT,
         allowNull: false,
       },
+      priceType: {
+        type: DataTypes.STRING(45),
+        allowNull: false,
+      },
+      color: {
+        type: DataTypes.STRING(45),
+        allowNull: false,
+      },
       startTime: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -46,7 +54,7 @@ module.exports = (sequelize, Sequelize) => {
       tableName: "lotteries",
     }
   );
-  // Lottery.sync({ force: true });
+  // Lottery.sync({ alter: true });
 
   return Lottery;
 };

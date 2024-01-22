@@ -7,7 +7,7 @@ const db = require("./src/database");
 const routes = require("./src/routes");
 const { logger } = require("./src/utils/logger");
 const errorHandler = require("./src/middlewares/errorHandler");
-const lotteryScheduler = require("./src/controller/lotteryScheduler"); // Import the lotteryScheduler
+const lotteryScheduler = require("./src/controller/lotteryScheduler");
 const port = 3000;
 
 app.use(bodyParser.json());
@@ -29,7 +29,7 @@ db.sequelize
 
 // Sync your models with the database
 db.sequelize.sync().then(() => {
-  logger().info("Database Connection Established Successfully");
+  logger().info("Database Synced With Models Successfully!!");
 });
 
 app.use("/dev", routes);
