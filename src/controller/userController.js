@@ -54,9 +54,9 @@ async function createUser(req, res, next) {
     const newUser = await UserModel.create({
       name,
       email,
-      userName: username || null, // Use null if username is not provided
-      password: hashedPassword || null, // Use null if password is not provided
-      isAuthUser: !!username && !!password, // Set isAuthUser to true if both username and password are provided
+      userName: username || null,
+      password: hashedPassword || null,
+      isAuthUser: !!username && !!password,
     });
 
     return res.status(201).json(newUser);
@@ -66,7 +66,8 @@ async function createUser(req, res, next) {
   }
 }
 
-async function loginUser(req, res) {
+async function loginUser(req, res, next) {
+  logger().info("user logging in ");
   try {
     const { username, password } = req.body;
     const user = await UserModel.findOne({ where: { userName: username } });
@@ -81,20 +82,112 @@ async function loginUser(req, res) {
       expiresIn: "2h",
     });
 
+    logger().info("user logging in successfully ");
     return res.status(200).json({
       status: 200,
       message: "User LoggedIn Successfully!",
       token: token,
     });
   } catch (error) {
-    logger().error("Error during admin login:", error);
-    return res
-      .status(500)
-      .json({ status: 500, error: "Internal Server Error" });
+    logger().error("Error during user login:", error);
+    return next(error);
+  }
+}
+
+// Update a user
+async function updateUser(req, res, next) {
+  const userId = req.user.id;
+  const { name, email, username, password } = req.body;
+
+  try {
+    const user = await UserModel.findOne({ where: { id: userId } });
+
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        error: "User not found",
+      });
+    }
+
+    // Update user attributes based on input
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.userName = username || user.userName;
+
+    if (password) {
+      user.password = bcrypt.hashSync(password, 10);
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      status: 200,
+      message: "User updated successfully!",
+      user: user,
+    });
+  } catch (error) {
+    logger().error("Error in updating user", error);
+    next(error);
+  }
+}
+
+// Delete a user
+async function deleteUser(req, res, next) {
+  const userId = req.user.id;
+
+  try {
+    const user = await UserModel.findOne({ where: { id: userId } });
+
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        error: "User not found",
+      });
+    }
+
+    await user.update({
+      enable: false,
+      deleted: true,
+    });
+
+    return res.status(200).json({
+      status: 200,
+      message: "User deleted successfully!",
+    });
+  } catch (error) {
+    logger().error("Error in deleting user", error);
+    next(error);
+  }
+}
+
+async function getSingleUser(req, res, next) {
+  const userId = req.query.id;
+
+  try {
+    const user = await UserModel.findOne({ where: { id: userId } });
+
+    if (!user) {
+      return res.status(404).json({
+        status: 404,
+        error: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: "User fetched successfully!",
+      data: user,
+    });
+  } catch (error) {
+    logger().error("Error in fetching single user", error);
+    next(error);
   }
 }
 module.exports = {
   getAllUsers,
   createUser,
   loginUser,
+  updateUser,
+  deleteUser,
+  getSingleUser,
 };

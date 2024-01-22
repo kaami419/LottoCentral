@@ -19,7 +19,6 @@ const authenticate = async (req, res, next) => {
     const decoded = jwt.verify(token, "shshs");
     logger().info("Decoded Token:", decoded);
 
-    // Assuming your user model has the same structure as the admin model
     const user = await UserModel.findOne({
       where: { id: decoded.id },
       attributes: [
@@ -36,7 +35,9 @@ const authenticate = async (req, res, next) => {
     logger().info("current user is", user);
 
     if (!user) {
-      return res.status(401).json({ error: "Unauthorized: Invalid token" });
+      return res
+        .status(401)
+        .json({ status: 401, error: "Unauthorized: Invalid token" });
     }
 
     req.user = {
@@ -45,7 +46,6 @@ const authenticate = async (req, res, next) => {
       name: user.name,
       email: user.email,
       isAuthUser: user.isAuthUser,
-      // Add other necessary properties from the user model
     };
     next();
   } catch (error) {

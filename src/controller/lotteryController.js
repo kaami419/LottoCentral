@@ -54,7 +54,7 @@ async function createLottery(req, res, next) {
 // Get lotteries within a specific time range
 async function getLotteriesInTimeRange(req, res, next) {
   const { startTime, expiryTime } = req.query;
-  logger().info("user is", req.user);
+  logger().info("user is", req.user4);
   try {
     const lotteries = await LotteryModel.findAll({
       where: {
@@ -74,8 +74,87 @@ async function getLotteriesInTimeRange(req, res, next) {
   }
 }
 
+// Update a lottery
+async function updateLottery(req, res, next) {
+  const lotteryId = req.query.id;
+  const { name, startTime, expiryTime, price } = req.body;
+
+  try {
+    // Check if the requesting user is an admin
+    if (req.user.userName !== "Admin") {
+      return res.status(403).json({
+        status: 403,
+        error: "Forbidden: Only admin can create lotteries.",
+      });
+    }
+    const lottery = await LotteryModel.findOne({ where: { id: lotteryId } });
+
+    if (!lottery) {
+      return res.status(404).json({
+        status: 404,
+        error: "Lottery not found",
+      });
+    }
+
+    // Update lottery attributes based on input
+    lottery.name = name || lottery.name;
+    lottery.startTime = startTime || lottery.startTime;
+    lottery.expiryTime = expiryTime || lottery.expiryTime;
+    lottery.price = price || lottery.price;
+
+    await lottery.save();
+
+    return res.status(200).json({
+      status: 200,
+      message: "Lottery updated successfully!",
+      lottery: lottery,
+    });
+  } catch (error) {
+    logger().error("Error in updating lottery", error);
+    next(error);
+  }
+}
+
+// Delete a lottery
+async function deleteLottery(req, res, next) {
+  const lotteryId = req.query.id;
+
+  try {
+    // Check if the requesting user is an admin
+    if (req.user.userName !== "Admin") {
+      return res.status(403).json({
+        status: 403,
+        error: "Forbidden: Only admin can create lotteries.",
+      });
+    }
+    const lottery = await LotteryModel.findOne({ where: { id: lotteryId } });
+
+    if (!lottery) {
+      return res.status(404).json({
+        status: 404,
+        error: "Lottery not found",
+      });
+    }
+
+    await lottery.update({
+      enable: false,
+      deleted: true,
+    });
+
+    return res.status(200).json({
+      status: 200,
+      message: "Lottery deleted successfully!",
+    });
+  } catch (error) {
+    logger().error("Error in deleting lottery", error);
+    next(error);
+  }
+}
+
 module.exports = {
   getAllLotteries,
   createLottery,
   getLotteriesInTimeRange,
+  updateLottery,
+  deleteLottery,
 };
