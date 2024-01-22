@@ -1,10 +1,10 @@
-// src/models/tables/lotteries.js
+// src/models/tables/admins.js
 
 module.exports = (sequelize, Sequelize) => {
   const DataTypes = Sequelize.DataTypes;
 
-  const Lottery = sequelize.define(
-    "lotteries",
+  const ContactUs = sequelize.define(
+    "contact_us",
     {
       id: {
         type: DataTypes.INTEGER(11),
@@ -15,38 +15,27 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: DataTypes.STRING(100),
         allowNull: false,
+        unique: true,
       },
-      price: {
-        type: DataTypes.FLOAT,
+      email: {
+        type: DataTypes.STRING(100),
         allowNull: false,
       },
-      startTime: {
-        type: DataTypes.DATE,
+      message: {
+        type: DataTypes.TEXT,
         allowNull: false,
       },
-      expiryTime: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      enable: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-      },
-      deleted: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-      },
-
       // Add other fields as needed
     },
     {
       underscored: true,
       timestamps: true,
       freezeTableName: true,
-      tableName: "lotteries",
+      tableName: "contact_us",
     }
   );
-  // Lottery.sync({ force: true });
 
-  return Lottery;
+//   ContactUs.sync({ force: true });
+
+  return ContactUs;
 };

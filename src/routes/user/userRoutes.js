@@ -7,6 +7,10 @@ const { authenticate } = require("../../middlewares/authMiddleware");
 router.get("/get", authenticate, userController.getAllUsers);
 router.post("/create", userController.createUser);
 router.post("/login", userController.loginUser);
+router.put("/update", authenticate, userController.updateUser);
+router.put("/delete", authenticate, userController.deleteUser);
+router.get("/getSingleUser", authenticate, userController.getSingleUser);
+
 // Define other routes
 
 module.exports = router;

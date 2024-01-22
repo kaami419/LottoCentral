@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const db = require("./src/database");
 const routes = require("./src/routes");
 const { logger } = require("./src/utils/logger");
@@ -11,6 +12,8 @@ const port = 3000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(cors());
 
 // Establish a connection to the database
 db.sequelize

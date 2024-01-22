@@ -29,7 +29,7 @@ async function loginAdmin(req, res) {
     }
 
     const token = jwt.sign({ id: admin.id }, "shshs", {
-      expiresIn: "2h", // Token expiration time
+      expiresIn: "2h",
     });
 
     return res.status(200).json({
