@@ -8,7 +8,7 @@ const bcrypt = require("bcrypt");
 // Get all users
 async function getAllUsers(req, res, next) {
   try {
-    logger().info("user is", req.user.userName);
+    logger().info("Getting All Users");
     // Check if the requesting user is an admin
     if (req.user.userName !== "Admin") {
       return res.status(403).json({
@@ -19,8 +19,17 @@ async function getAllUsers(req, res, next) {
 
     logger().info("req is", req);
 
-    const users = await UserModel.findAll();
-    return res.status(200).json(users);
+    const users = await UserModel.findAll({
+      where: {
+        enable: true,
+        deleted: false,
+      },
+    });
+    return res.status(200).json({
+      status: 200,
+      message: "users fetched successfully",
+      data: users,
+    });
   } catch (error) {
     logger().error("Error in getting all users", error);
     next(error);
@@ -32,6 +41,7 @@ async function createUser(req, res, next) {
   const { name, email, username, password } = req.body;
 
   try {
+    logger().info("creating a user");
     // Validate the input
     if ((!name || !email) && (!username || !password)) {
       return res.status(400).json({
@@ -59,18 +69,27 @@ async function createUser(req, res, next) {
       isAuthUser: !!username && !!password,
     });
 
-    return res.status(201).json(newUser);
+    return res
+      .status(200)
+      .json({
+        status: 200,
+        message: "User Created Successfully",
+        data: newUser,
+      });
   } catch (error) {
     logger().error("Error in creating a user", error);
     next(error);
   }
 }
 
+//  login user
 async function loginUser(req, res, next) {
   logger().info("user logging in ");
   try {
     const { username, password } = req.body;
-    const user = await UserModel.findOne({ where: { userName: username } });
+    const user = await UserModel.findOne({
+      where: { userName: username, enable: true, deleted: false },
+    });
 
     if (!user || !bcrypt.compareSync(password, user.password)) {
       return res
@@ -164,7 +183,9 @@ async function getSingleUser(req, res, next) {
   const userId = req.query.id;
 
   try {
-    const user = await UserModel.findOne({ where: { id: userId } });
+    const user = await UserModel.findOne({
+      where: { id: userId, enable: true, deleted: false },
+    });
 
     if (!user) {
       return res.status(404).json({

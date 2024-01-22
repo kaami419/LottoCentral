@@ -7,7 +7,12 @@ const { Op } = require("sequelize");
 // Get all lotteries
 async function getAllLotteries(req, res, next) {
   try {
-    const lotteries = await LotteryModel.findAll();
+    const lotteries = await LotteryModel.findAll({
+      where: {
+        enable: true,
+        deleted: false,
+      },
+    });
     return res.status(200).json(lotteries);
   } catch (error) {
     logger().error("Error in getting all lotteries", error);
@@ -17,7 +22,7 @@ async function getAllLotteries(req, res, next) {
 
 // Create a new lottery
 async function createLottery(req, res, next) {
-  const { name, startTime, expiryTime, price } = req.body;
+  const { name, startTime, expiryTime, price, priceType, color } = req.body;
 
   try {
     // Check if the requesting user is an admin
@@ -29,10 +34,11 @@ async function createLottery(req, res, next) {
     }
 
     // Validate the input
-    if (!name || !startTime || !expiryTime || !price) {
+    if (!name || !startTime || !expiryTime || !price || !priceType || !color) {
       return res.status(400).json({
         status: 400,
-        error: "Name, startTime, endTime, and price are required fields.",
+        error:
+          "Name, start time, end time,color,price type, and price are required fields.",
       });
     }
 
@@ -42,9 +48,17 @@ async function createLottery(req, res, next) {
       startTime,
       expiryTime,
       price,
+      priceType,
+      color,
     });
 
-    return res.status(201).json(newLottery);
+    return res
+      .status(200)
+      .json({
+        status: 200,
+        message: "Lottery Created Successfully",
+        data: newLottery,
+      });
   } catch (error) {
     logger().error("Error in creating a lottery", error);
     next(error);
@@ -54,7 +68,7 @@ async function createLottery(req, res, next) {
 // Get lotteries within a specific time range
 async function getLotteriesInTimeRange(req, res, next) {
   const { startTime, expiryTime } = req.query;
-  logger().info("user is", req.user4);
+  logger().info("user is", req.user);
   try {
     const lotteries = await LotteryModel.findAll({
       where: {
@@ -64,6 +78,8 @@ async function getLotteriesInTimeRange(req, res, next) {
         expiryTime: {
           [Op.lte]: new Date(expiryTime),
         },
+        enable: true,
+        deleted: false,
       },
     });
 
@@ -77,7 +93,7 @@ async function getLotteriesInTimeRange(req, res, next) {
 // Update a lottery
 async function updateLottery(req, res, next) {
   const lotteryId = req.query.id;
-  const { name, startTime, expiryTime, price } = req.body;
+  const { name, startTime, expiryTime, price, priceType, color } = req.body;
 
   try {
     // Check if the requesting user is an admin
@@ -101,6 +117,8 @@ async function updateLottery(req, res, next) {
     lottery.startTime = startTime || lottery.startTime;
     lottery.expiryTime = expiryTime || lottery.expiryTime;
     lottery.price = price || lottery.price;
+    lottery.priceType = priceType || lottery.priceType;
+    lottery.color = color || lottery.color;
 
     await lottery.save();
 
