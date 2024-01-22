@@ -10,7 +10,7 @@ async function getAllInquiryUsers(req, res, next) {
     if (req.user.userName.toLowerCase() !== "admin") {
       return res.status(403).json({
         status: 403,
-        error: "Forbidden: Only admin can create lotteries.",
+        error: "Forbidden: Only admin can view lotteries.",
       });
     }
     const InquiryUsers = await InquiryUsersModel.findAll();
