@@ -15,7 +15,6 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: DataTypes.STRING(100),
         allowNull: false,
-        unique: true,
       },
       email: {
         type: DataTypes.STRING(100),
@@ -35,7 +34,7 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-//   ContactUs.sync({ force: true });
+  //   ContactUs.sync({ force: true });
 
   return ContactUs;
 };
