@@ -95,7 +95,8 @@ async function createLottery(req, res, next) {
             "Name, start time, end time,color,price type, and price are required fields.",
         });
       }
-      const IMAGE_BASE_URL = "http://192.168.100.22:3000/dev/images";
+      const IMAGE_BASE_URL =
+        "https://lottocentral-production.up.railway.app/dev/images";
 
       const imageUrl = `${IMAGE_BASE_URL}/uploads/${imageFilename}`;
 
