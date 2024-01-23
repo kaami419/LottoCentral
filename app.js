@@ -15,6 +15,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors());
 
+// Serve static files from the "uploads" directory
+app.use("/dev/images/uploads", express.static("src/uploads"));
+
 // Establish a connection to the database
 db.sequelize
   .authenticate()

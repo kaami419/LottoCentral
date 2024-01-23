@@ -2,13 +2,12 @@
 
 const express = require("express");
 const router = express.Router();
-const adminController = require("../../controller/adminController");
+const inquiryUserController = require("../../controller/InquiryUsersController");
 const { authenticate } = require("../../middlewares/authMiddleware");
 
 // Route to get all admins
-router.get("/get", authenticate, adminController.getAllAdmins);
-router.post("/login", adminController.loginAdmin);
-router.post("/create", adminController.createAdmin);
+router.get("/get", authenticate, inquiryUserController.getAllInquiryUsers);
+router.post("/create", inquiryUserController.createInquiryUser);
 
 // Implement other admin routes as needed
 

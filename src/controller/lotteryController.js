@@ -3,6 +3,35 @@
 const { LotteryModel } = require("../models");
 const { logger } = require("../utils/logger");
 const { Op } = require("sequelize");
+const multer = require("multer");
+const path = require("path");
+
+// ===============================multer setup ===============================================
+
+// Set up multer storage and file filter
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../uploads")); // Set the destination folder for uploaded images
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const extension = path.extname(file.originalname);
+    cb(null, file.fieldname + "-" + uniqueSuffix + extension);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  // Check file types to allow only images
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Invalid file type. Only images are allowed."), false);
+  }
+};
+
+const upload = multer({ storage, fileFilter });
+
+// ===============================multer setup ===============================================
 
 // Get all lotteries
 async function getAllLotteries(req, res, next) {
@@ -22,43 +51,76 @@ async function getAllLotteries(req, res, next) {
 
 // Create a new lottery
 async function createLottery(req, res, next) {
-  const { name, startTime, expiryTime, price, priceType, color } = req.body;
+  logger().info("Running Create Lottery Function");
 
   try {
     // Check if the requesting user is an admin
-    if (req.user.userName !== "Admin") {
+    if (req.user.userName.toLowerCase() !== "admin") {
       return res.status(403).json({
         status: 403,
         error: "Forbidden: Only admin can create lotteries.",
       });
     }
 
-    // Validate the input
-    if (!name || !startTime || !expiryTime || !price || !priceType || !color) {
-      return res.status(400).json({
-        status: 400,
-        error:
-          "Name, start time, end time,color,price type, and price are required fields.",
+    // ==========================multerrrr ======================================================
+
+    // Use multer middleware to handle image upload
+    upload.single("image")(req, res, async (err) => {
+      if (err) {
+        return res.status(400).json({
+          status: 400,
+          error: err.message,
+        });
+      }
+
+      // Get the filename of the uploaded image
+      const imageFilename = req.file ? req.file.filename : null;
+
+      logger().info();
+
+      const { name, startTime, expiryTime, price, priceType, color } = req.body;
+
+      // Validate the input
+      if (
+        !name ||
+        !startTime ||
+        !expiryTime ||
+        !price ||
+        !priceType ||
+        !color
+      ) {
+        return res.status(400).json({
+          status: 400,
+          error:
+            "Name, start time, end time,color,price type, and price are required fields.",
+        });
+      }
+      const IMAGE_BASE_URL = "http://192.168.100.22:3000/dev/images";
+
+      const imageUrl = `${IMAGE_BASE_URL}/uploads/${imageFilename}`;
+
+      // Create the lottery based on input and include the image filename
+      const newLottery = await LotteryModel.create({
+        name,
+        startTime,
+        expiryTime,
+        price,
+        priceType,
+        color,
+        image: imageFilename,
+        imageUrl: imageUrl,
       });
-    }
 
-    // Create the lottery based on input
-    const newLottery = await LotteryModel.create({
-      name,
-      startTime,
-      expiryTime,
-      price,
-      priceType,
-      color,
-    });
+      logger().info("new lotto is", newLottery);
 
-    return res
-      .status(200)
-      .json({
+      return res.status(200).json({
         status: 200,
         message: "Lottery Created Successfully",
         data: newLottery,
       });
+    });
+
+    // ==========================multerrr =======================================================
   } catch (error) {
     logger().error("Error in creating a lottery", error);
     next(error);
@@ -97,7 +159,7 @@ async function updateLottery(req, res, next) {
 
   try {
     // Check if the requesting user is an admin
-    if (req.user.userName !== "Admin") {
+    if (req.user.userName.toLowerCase() !== "admin") {
       return res.status(403).json({
         status: 403,
         error: "Forbidden: Only admin can create lotteries.",
@@ -139,7 +201,7 @@ async function deleteLottery(req, res, next) {
 
   try {
     // Check if the requesting user is an admin
-    if (req.user.userName !== "Admin") {
+    if (req.user.userName.toLowerCase() !== "admin") {
       return res.status(403).json({
         status: 403,
         error: "Forbidden: Only admin can create lotteries.",

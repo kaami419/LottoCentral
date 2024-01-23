@@ -1,14 +1,17 @@
 const nodemailer = require("nodemailer");
-const { Our_Email } = require("../utils/common");
+const { Our_Email, NodeMailerEmail } = require("../utils/common");
 const { ContactUsModel } = require("../models");
 const { logger } = require("../utils/logger");
 
 // Create a nodemailer transporter with your email configuration
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  // host: "smtp.gmail.com",
+  service: "Gmail",
+  // port: 587,
+  // secure: false, // true for 465, false for other ports
   auth: {
-    user: Our_Email,
-    pass: "Kaami@123",
+    user: NodeMailerEmail,
+    pass: process.env.PASS,
   },
 });
 
@@ -16,6 +19,7 @@ const transporter = nodemailer.createTransport({
 
 // ContactUs API
 async function contactUs(req, res, next) {
+  logger().info("running contact us function");
   const { name, email, message } = req.body;
 
   try {
@@ -36,6 +40,7 @@ async function contactUs(req, res, next) {
       message: message,
     });
 
+    logger().info("Mail sent successfully");
     return res.status(200).json({
       status: 200,
       message: "Contact form submitted successfully!",

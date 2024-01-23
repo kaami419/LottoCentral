@@ -1,13 +1,13 @@
 const { sequelize, Sequelize } = require("../database");
 // /**/ import tables
 const User = require("./tables/users");
-const Admin = require("./tables/admins");
+const InquiryUsers = require("./tables/inquiryUsers");
 const Lottery = require("./tables/lotteries");
 const ContactUs = require("./tables/contactUs");
 
 // /**/ initialize tables
 const UserModel = User(sequelize, Sequelize);
-const AdminModel = Admin(sequelize, Sequelize);
+const InquiryUsersModel = InquiryUsers(sequelize, Sequelize);
 const LotteryModel = Lottery(sequelize, Sequelize);
 const ContactUsModel = ContactUs(sequelize, Sequelize);
 
@@ -18,7 +18,7 @@ const ContactUsModel = ContactUs(sequelize, Sequelize);
 //  /**/ export models
 module.exports = {
   UserModel,
-  AdminModel,
+  InquiryUsersModel,
   LotteryModel,
   ContactUsModel,
 };

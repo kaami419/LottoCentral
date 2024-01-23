@@ -5,3 +5,7 @@
 
 # Ignore Node.js modules
 node_modules/
+
+# amplify
+.amplify
+amplifyconfiguration*
