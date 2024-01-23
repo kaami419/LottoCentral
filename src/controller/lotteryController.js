@@ -76,8 +76,6 @@ async function createLottery(req, res, next) {
       // Get the filename of the uploaded image
       const imageFilename = req.file ? req.file.filename : null;
 
-      logger().info();
-
       const { name, startTime, expiryTime, price, priceType, color } = req.body;
 
       // Validate the input
@@ -156,7 +154,7 @@ async function getLotteriesInTimeRange(req, res, next) {
 // Update a lottery
 async function updateLottery(req, res, next) {
   const lotteryId = req.query.id;
-  const { name, startTime, expiryTime, price, priceType, color } = req.body;
+  // const { name, startTime, expiryTime, price, priceType, color } = req.body;
 
   try {
     // Check if the requesting user is an admin
@@ -166,29 +164,51 @@ async function updateLottery(req, res, next) {
         error: "Forbidden: Only admin can create lotteries.",
       });
     }
-    const lottery = await LotteryModel.findOne({ where: { id: lotteryId } });
 
-    if (!lottery) {
-      return res.status(404).json({
-        status: 404,
-        error: "Lottery not found",
+    upload.single("image")(req, res, async (err) => {
+      if (err) {
+        return res.status(400).json({
+          status: 400,
+          error: err.message,
+        });
+      }
+
+      // Get the filename of the uploaded image
+      const imageFilename = req.file ? req.file.filename : null;
+
+      const IMAGE_BASE_URL =
+        "https://lottocentral-production.up.railway.app/dev/images";
+
+      const imageUrl = `${IMAGE_BASE_URL}/uploads/${imageFilename}`;
+
+      const { name, startTime, expiryTime, price, priceType, color } = req.body;
+
+      const lottery = await LotteryModel.findOne({ where: { id: lotteryId } });
+
+      if (!lottery) {
+        return res.status(404).json({
+          status: 404,
+          error: "Lottery not found",
+        });
+      }
+
+      // Update lottery attributes based on input
+      lottery.name = name ? name : lottery.name;
+      lottery.startTime = startTime ? startTime : lottery.startTime;
+      lottery.expiryTime = expiryTime ? expiryTime : lottery.expiryTime;
+      lottery.price = price ? price : lottery.price;
+      lottery.priceType = priceType ? priceType : lottery.priceType;
+      lottery.color = color ? color : lottery.color;
+      lottery.image = imageFilename ? imageFilename : lottery.image;
+      lottery.imageUrl = imageUrl ? imageUrl : lottery.imageUrl;
+
+      await lottery.save();
+
+      return res.status(200).json({
+        status: 200,
+        message: "Lottery updated successfully!",
+        lottery: lottery,
       });
-    }
-
-    // Update lottery attributes based on input
-    lottery.name = name || lottery.name;
-    lottery.startTime = startTime || lottery.startTime;
-    lottery.expiryTime = expiryTime || lottery.expiryTime;
-    lottery.price = price || lottery.price;
-    lottery.priceType = priceType || lottery.priceType;
-    lottery.color = color || lottery.color;
-
-    await lottery.save();
-
-    return res.status(200).json({
-      status: 200,
-      message: "Lottery updated successfully!",
-      lottery: lottery,
     });
   } catch (error) {
     logger().error("Error in updating lottery", error);
