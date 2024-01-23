@@ -8,7 +8,7 @@ const routes = require("./src/routes");
 const { logger } = require("./src/utils/logger");
 const errorHandler = require("./src/middlewares/errorHandler");
 const lotteryScheduler = require("./src/controller/lotteryScheduler");
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
