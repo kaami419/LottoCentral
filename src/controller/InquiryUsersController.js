@@ -25,6 +25,7 @@ async function getAllInquiryUsers(req, res, next) {
 
 async function createInquiryUser(req, res, next) {
   try {
+    logger().info("Creating User With Email");
     const { email } = req.body;
 
     // Validate the input
@@ -35,16 +36,30 @@ async function createInquiryUser(req, res, next) {
       });
     }
 
+    const duplicateEmailCheck = await InquiryUsersModel.findOne({
+      where: {
+        email: email,
+      },
+    });
+
+    if (duplicateEmailCheck) {
+      logger().info("Duplicate Email Found");
+      return res.status(400).json({
+        status: 400,
+        error: "User Already Exist With This Email",
+      });
+    }
+
     const newInquiryUser = await InquiryUsersModel.create({
       email,
     });
 
     return res
       .status(201)
-      .json({ status: 200, message: "Inquiry user created successfully" });
+      .json({ status: 200, message: "User Signed Up Successfully" });
   } catch (error) {
     logger().error("Error creating Inquiry user:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return next(error);
   }
 }
 

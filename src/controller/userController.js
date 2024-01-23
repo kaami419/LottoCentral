@@ -43,7 +43,7 @@ async function createUser(req, res, next) {
   try {
     logger().info("creating a user");
     // Validate the input
-    if (!name && !email && !username && !password) {
+    if (!name || !email || !username || !password) {
       return res.status(400).json({
         status: 400,
         error: "Email, name, username and password are required.",
@@ -62,10 +62,10 @@ async function createUser(req, res, next) {
 
     // Create the user based on input
     const newUser = await UserModel.create({
-      name: name || null,
-      email,
-      userName: username || null,
-      password: hashedPassword || null,
+      name: name,
+      email: email,
+      userName: username,
+      password: hashedPassword,
       isAuthUser: !!username && !!password,
     });
 
