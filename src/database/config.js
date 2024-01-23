@@ -3,7 +3,7 @@ const config = {
   password: process.env.DB_PASSWORD || "Password_123",
   database: process.env.DB_DATABASE || "Lotto_Db",
   host: process.env.DB_HOST || "127.0.0.1",
-  port: process.env.PORT || 3306,
+  port: process.env.DB_PORT || 3306,
 };
 
 console.log(config);
