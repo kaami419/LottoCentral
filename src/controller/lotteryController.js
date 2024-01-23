@@ -174,7 +174,7 @@ async function updateLottery(req, res, next) {
       }
 
       // Get the filename of the uploaded image
-      const imageFilename = req.file ? req.file.filename : null;
+      const imageFilename = req.file ? req.file.filename : lottery.image;
 
       const IMAGE_BASE_URL =
         "https://lottocentral-production.up.railway.app/dev/images";
