@@ -173,6 +173,8 @@ async function updateLottery(req, res, next) {
         });
       }
 
+      const lottery = await LotteryModel.findOne({ where: { id: lotteryId } });
+
       // Get the filename of the uploaded image
       const imageFilename = req.file ? req.file.filename : lottery.image;
 
@@ -182,8 +184,6 @@ async function updateLottery(req, res, next) {
       const imageUrl = `${IMAGE_BASE_URL}/uploads/${imageFilename}`;
 
       const { name, startTime, expiryTime, price, priceType, color } = req.body;
-
-      const lottery = await LotteryModel.findOne({ where: { id: lotteryId } });
 
       if (!lottery) {
         return res.status(404).json({
