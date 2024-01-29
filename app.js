@@ -15,6 +15,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors());
 
+app.get("/health", (req, res) => {
+  console.log("health check");
+  res.status(200).send("up");
+});
+
 // Serve static files from the "uploads" directory
 app.use("/dev/images/uploads", express.static("src/uploads"));
 
