@@ -8,6 +8,8 @@ EXPOSE 3000
 
 RUN npm i
 
+RUN apk add --no-cache curl 
+
 COPY . .
 
 CMD [ "node","app.js" ]
