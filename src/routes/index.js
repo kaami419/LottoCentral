@@ -7,6 +7,10 @@ const lotteryRoutes = require("./lottery/lotteryRoutes");
 const ContactUsRoutes = require("./contactUs/contactUsRoutes");
 // Import other route files
 
+router.get("/health", (req, res) => {
+  console.log("health check");
+  res.status(200).send("up");
+});
 // Use the routes
 router.use("/users", userRoutes);
 router.use("/inquiry/user", inquiryUserRoutes);

@@ -32,7 +32,7 @@ const authenticate = async (req, res, next) => {
       ],
     });
 
-    logger().info("current user is", user);
+    // logger().info("current user is", user);
 
     if (!user) {
       return res

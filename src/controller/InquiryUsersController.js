@@ -2,8 +2,8 @@
 
 const { InquiryUsersModel } = require("../models");
 const { logger } = require("../utils/logger");
-// const jwt = require("jsonwebtoken");
-// const bcrypt = require("bcrypt");
+const { Our_Email } = require("../utils/common");
+const { transporter } = require("../utils/mailer");
 
 async function getAllInquiryUsers(req, res, next) {
   try {
@@ -28,8 +28,8 @@ async function createInquiryUser(req, res, next) {
     logger().info("Creating User With Email");
     const { email } = req.body;
 
-    // Validate the input
     if (!email) {
+      logger().info("No Email Provided");
       return res.status(400).json({
         status: 400,
         error: "Email is required.",
@@ -50,9 +50,36 @@ async function createInquiryUser(req, res, next) {
       });
     }
 
-    const newInquiryUser = await InquiryUsersModel.create({
+    await InquiryUsersModel.create({
       email,
     });
+    logger().info("User Created");
+
+    const welcomeMailOptions = {
+      from: Our_Email,
+      to: email,
+      subject: "Welcome to Lotto Central",
+      html: `
+      <p style= "font-size: 15px; font-weight:bold;">Thank you for signing up! Welcome to Lotto Central.</p>
+      <br />
+      <p><b>Address</b>: 674 Washington Avenue, Australia</p>
+      <p><b>Mobile</b>: 602-216-4143</p>
+      <p><b>Email<b/>: info@lottocentral.com</p>
+        <img src="https://lottocentral.in/assets/lotto-central-mfyjWcWq.png" style="background-color: rgb(14, 12, 49); width: 200px; height: 75px" />`,
+    };
+
+    await transporter.sendMail(welcomeMailOptions);
+    logger().info("Welcome Mail sent successfully");
+
+    const notifyMailOptions = {
+      from: email,
+      to: Our_Email,
+      subject: "New Sign Up",
+      text: `New user signed up with email: ${email}`,
+    };
+
+    await transporter.sendMail(notifyMailOptions);
+    logger().info("Notification Mail sent successfully");
 
     return res
       .status(201)
@@ -63,10 +90,7 @@ async function createInquiryUser(req, res, next) {
   }
 }
 
-// Implement other admin CRUD operations as needed
-
 module.exports = {
   getAllInquiryUsers,
   createInquiryUser,
-  // Add other admin functions
 };

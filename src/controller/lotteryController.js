@@ -35,6 +35,7 @@ const upload = multer({ storage, fileFilter });
 
 // Get all lotteries
 async function getAllLotteries(req, res, next) {
+  logger().info("Fetching All Lotteries");
   try {
     const lotteries = await LotteryModel.findAll({
       where: {
@@ -110,7 +111,7 @@ async function createLottery(req, res, next) {
         imageUrl: imageUrl,
       });
 
-      logger().info("new lotto is", newLottery);
+      // logger().info("new lotto is", newLottery);
 
       return res.status(200).json({
         status: 200,

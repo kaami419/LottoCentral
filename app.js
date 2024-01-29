@@ -40,7 +40,7 @@ app.use("/dev", routes);
 app.use(errorHandler);
 
 // Scheduler for every night at midnight
-// lotteryScheduler.start();
+lotteryScheduler.start();
 
 app.listen(port, () => {
   logger().info(`Server is running on port ${port}`);
